@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ledger margin BBCA</title>
+<style>
+:root{--bg:#fff;--ink:#10243A;--mute:#5B6B7C;--line:#CFD6DF;--head:#EEF1F5;--mc:#FFF1DC;--fc:#FBE3E3;--neg:#C42B2B;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0D1620;--ink:#E8EDF3;--mute:#9AA9B9;--line:#2B3B4D;--head:#182636;--mc:#3A2D15;--fc:#3D1C1E;--neg:#F0605D;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0D1620;--ink:#E8EDF3;--mute:#9AA9B9;--line:#2B3B4D;--head:#182636;--mc:#3A2D15;--fc:#3D1C1E;--neg:#F0605D;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 12px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+main{padding:12px 4px 24px}
+h1{font-size:15px;font-weight:600;margin:0 4px 4px}
+p{margin:0 4px 8px;color:var(--mute);font-size:10px}
+table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:7.5px;line-height:1.3}
+th,td{border:.5px solid var(--line);padding:3px 2px;text-align:center;overflow-wrap:anywhere;vertical-align:middle}
+th{background:var(--head);font-weight:600}
+td.g{background:var(--head);font-weight:600;text-align:left;padding:3px 4px;font-size:8px}
+tr.mc td{background:var(--mc)}
+tr.fc td{background:var(--fc)}
+b.n{color:var(--neg);font-weight:600}
+td.t{text-align:left}
+td span{color:var(--mute)}
+</style>
+</head>
+<body>
+<main>
+<h1>Ledger margin BBCA</h1>
+<p>Satuan Rp juta, kecuali bunga (Rp ribu). Modal 50 jt, pinjaman 50 jt, posisi awal 100 jt, bunga 18%/tahun dari pinjaman. Margin call (MC) di bawah 40%, force close di bawah 30% (ilustrasi). Baris oranye: margin call. Baris merah: force close. Sel bertumpuk dibaca atas lalu bawah sesuai judul kolom.</p>
+<table>
+<colgroup><col style="width:10%"><col style="width:8%"><col style="width:10%"><col style="width:11%"><col style="width:10%"><col style="width:11%"><col style="width:17%"><col style="width:23%"></colgroup>
+<thead><tr><th>Hari / harga vs beli / harian</th><th>Posisi</th><th>Kewajiban / bunga kum.</th><th>Ekuitas / hasil vs modal</th><th>Rasio posisi / rasio utang</th><th>Margin call / selisih ke 40%</th><th>Keluar MC ke 40%</th><th>Force close</th></tr></thead>
+<tbody id="b"></tbody>
+</table>
+<p style="margin-top:8px">Kewajiban = pinjaman + bunga kum. Ekuitas = posisi − kewajiban. Rasio posisi = ekuitas ÷ posisi. Rasio utang = kewajiban ÷ posisi. Selisih ke 40% dalam poin %. Keluar MC: setor tunai mengurangi kewajiban; jual sebagian melunasi kewajiban dari hasil jual. Target pulih 40% adalah minimum; sekuritas bisa meminta lebih tinggi. Setor atau jual hanya berlaku jika dilakukan sebelum force close. Fee dan pajak belum dihitung. Ilustrasi edukatif, bukan rekomendasi.</p>
+</main>
+<script>
+var R=[
+["Jalur utama (harga turun bertahap)"],
+["H1","+3,0%","+3,0%","103,00","50,02","24,7","52,98","51,4%","48,6%","+6,0%","Tidak","+11,4",["-"],"Tidak"],
+["H2","-2,15%","-5,0%","97,85","50,05","49,3","47,80","48,9%","51,1%","-4,4%","Tidak","+8,9",["-"],"Tidak"],
+["H3","-18,0%","-16,2%","82,00","50,07","74,0","31,93","38,9%","61,1%","-36,1%","Ya","-1,1",["Setor 0,87","Jual 2,18"],"Tidak, jika dipenuhi","mc"],
+["H4","-30,0%","-14,6%","70,00","50,10","98,6","19,90","28,4%","71,6%","-60,2%","Ya, tidak dipenuhi","-11,6",["Setor 8,10","Jual 20,25"],"Ya: jual 70,00, lunasi 50,10, sisa 19,90","fc"],
+["Setelah 1 minggu (harga di H7)"],
+["H7","+20%","-","120,00","50,17","172,6","69,83","58,2%","41,8%","+39,7%","Tidak","+18,2",["-"],"Tidak"],
+["H7","+5%","-","105,00","50,17","172,6","54,83","52,2%","47,8%","+9,7%","Tidak","+12,2",["-"],"Tidak"],
+["H7","0%","-","100,00","50,17","172,6","49,83","49,8%","50,2%","-0,3%","Tidak","+9,8",["-"],"Tidak"],
+["H7","-2,15%","-","97,85","50,17","172,6","47,68","48,7%","51,3%","-4,6%","Tidak","+8,7",["-"],"Tidak"],
+["H7","-10%","-","90,00","50,17","172,6","39,83","44,3%","55,7%","-20,3%","Tidak","+4,3",["-"],"Tidak"],
+["Skenario alternatif (jalur terpisah dari harga beli)"],
+["Gap H4","-35%","-","65,00","50,10","98,6","14,90","22,9%","77,1%","-70,2%","Langsung lewat","-17,1",["Setor 11,10","Jual 27,75"],"Ya, sisa 14,90","fc"],
+["ARB beruntun H4","-55%","-","45,00","50,10","98,6","-5,10","-11,3%","111,3%","-110,2%","Lewat","-51,3",["Setor 23,10","Jual tidak cukup"],"Tertunda; user menombok 5,10","fc"],
+["Suspensi lalu buka H14","-40%","-","60,00","50,35","345,2","9,65","16,1%","83,9%","-80,7%","Lewat","-23,9",["Setor 14,35","Jual 35,86"],"Ya, sisa 9,65","fc"],
+["Dicoret dari daftar margin H7","0%","-","100,00","50,17","172,6","49,83","49,8%","50,2%","-0,3%","Tidak","+9,8",["Wajib lunasi 50,17 (jual atau setor)"],"Tidak, kecuali batas waktu lewat"]
+];
+function N(v){return(v.charAt(0)==="-"&&v.length>1)?'<b class="n">'+v+'</b>':v}
+var h="";
+R.forEach(function(r){
+if(r.length===1){h+='<tr><td class="g" colspan="8">'+r[0]+'</td></tr>';return}
+h+='<tr class="'+(r[14]||"")+'">'+
+'<td>'+r[0]+'<br><span>'+r[1]+'</span>'+(r[2]!=="-"?'<br><span>hr '+r[2]+'</span>':'')+'</td>'+
+'<td>'+r[3]+'</td>'+
+'<td>'+r[4]+'<br><span>+'+r[5]+' rb</span></td>'+
+'<td>'+N(r[6])+'<br>'+N(r[9])+'</td>'+
+'<td>'+N(r[7])+'<br>'+N(r[8])+'</td>'+
+'<td>'+r[10]+'<br><span>'+r[11]+'</span></td>'+
+'<td class="t">'+r[12].join('<br>')+'</td>'+
+'<td class="t">'+r[13]+'</td></tr>'});
+document.getElementById("b").innerHTML=h;
+</script>
+</body>
+</html>
